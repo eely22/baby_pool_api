@@ -1,0 +1,10 @@
+{
+    "prod": {
+        "project_name": "baby_pool_api",
+        "app_function": "baby_pool_api.app", 
+        "s3_bucket": "zappa-baby-pool-api",
+        "cors": true,
+        "memory_size": 1024,
+        "timeout_seconds": 36
+    }
+}
