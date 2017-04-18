@@ -86,6 +86,8 @@ def update():
             params = get_payload(request)
 
             email = params['email']
+            name = params['name']
+            length = params['length']
             weight = params['weight']
             date = params["date"]
             sex = params["sex"]
@@ -96,8 +98,8 @@ def update():
         try:
             client = boto3.client('dynamodb')
             response = client.put_item(TableName=app.config['TABLE_NAME'], Item={
-                'email': {'S': email}, 'weight': {'S': weight},
-                'date': {'S': date}, 'sex': {'S': sex}, 'comment': {'S': comment},
+                'name': {'S': name}, 'email': {'S': email}, 'weight': {'S': weight},
+                'date': {'S': date}, 'sex': {'S': sex}, 'length': {'S': length}, 'comment': {'S': comment},
                 'submitted': {'S': datetime.datetime.now().strftime("%m/%d/%y")},
                 'submitted_int': {'N': str(current_milli_time())}})
         except Exception as ex:
