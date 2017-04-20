@@ -87,7 +87,7 @@ def update():
             if email is not None:
                 response = convert_scan_response(client.get_item(TableName=app.config['TABLE_NAME'], Key={'email': {'S': email}})['Item'])
             else:
-                response = convert_scan_responses(client.scan(TableName=app.config['TABLE_NAME'])['Items'])
+                response = convert_scan_responses(sort_responses(client.scan(TableName=app.config['TABLE_NAME'])['Items']))
         except Exception as ex:
             return internal_error(ex.message)
 
@@ -130,6 +130,9 @@ def get_payload(request):
         return data if data is not None else request.form
     else:
         return request.args
+
+def sort_responses(items):
+    return sorted(items, key=lambda item: item['submitted_int']['N'], reverse=True)
 
 def convert_scan_responses(items):
     parsed_items = []
