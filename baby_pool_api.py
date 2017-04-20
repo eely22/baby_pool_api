@@ -74,8 +74,20 @@ def version():
 def update():
     if request.method == 'GET':
         try:
+            params = get_payload(request)
+            email = None
+            if 'email' in params:
+                email = params['email']
+
+        except Exception as ex:
+            return bad_request("Invalid parameters")
+
+        try:
             client = boto3.client('dynamodb')
-            response = convert_scan_response(client.scan(TableName=app.config['TABLE_NAME'])['Items'])
+            if email is not None:
+                response = convert_scan_response(client.get_item(TableName=app.config['TABLE_NAME'], Key={'email': {'S': email}})['Item'])
+            else:
+                response = convert_scan_responses(client.scan(TableName=app.config['TABLE_NAME'])['Items'])
         except Exception as ex:
             return internal_error(ex.message)
 
@@ -119,14 +131,18 @@ def get_payload(request):
     else:
         return request.args
 
-def convert_scan_response(items):
+def convert_scan_responses(items):
     parsed_items = []
     for item in items:
-        obj = {}
-        for key in item.keys():
-            obj[key] = item[key][item[key].keys()[0]]
-        parsed_items.append(obj)
+        parsed_items.append(convert_scan_response(item))
+
     return parsed_items
+
+def convert_scan_response(item):
+    obj = {}
+    for key in item.keys():
+        obj[key] = item[key][item[key].keys()[0]]
+    return obj
 
 
 
